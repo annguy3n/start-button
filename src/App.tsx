@@ -34,8 +34,10 @@ function useApi() {
     if (timer.current) {
       clearInterval(timer.current);
     }
-    // @ts-ignore
-    timer.current = setInterval(checkStatus, 5000);
+    // Need to use the explicit window object reference here
+    // to satisfy the TypeScript compiler and correct fix
+    // the evaluated type returned by setInterval
+    timer.current = window.setInterval(checkStatus, 5000);
   };
 
   const getData = () => {
