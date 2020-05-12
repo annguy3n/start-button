@@ -19,7 +19,7 @@ function useApi() {
   // on every component update
   const timer = React.useRef<number>(0);
 
-  const checkStatus = () => {
+  const checkStatus = React.useCallback(() => {
     getStatus().then((response: Partial<ApiStatusResponse>) => {
       if (status.status !== response.status) {
         setStatus(response);
@@ -28,9 +28,9 @@ function useApi() {
         }
       }
     });
-  };
+  }, [status.status]);
 
-  const runStatusPoll = () => {
+  const runStatusPoll = React.useCallback(() => {
     if (timer.current) {
       clearInterval(timer.current);
     }
@@ -38,9 +38,9 @@ function useApi() {
     // to satisfy the TypeScript compiler and correct fix
     // the evaluated type returned by setInterval
     timer.current = window.setInterval(checkStatus, 5000);
-  };
+  }, [checkStatus]);
 
-  const getData = () => {
+  const getData = React.useCallback(() => {
     start().then((resp) => {
       const { ok, status, estimatedTime } = resp as ApiStatusResponse;
       if (ok) {
@@ -51,7 +51,7 @@ function useApi() {
         runStatusPoll();
       }
     });
-  };
+  }, [runStatusPoll]);
 
   return {
     ...status,
