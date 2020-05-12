@@ -9,9 +9,29 @@ function useApi() {
     estimatedTime: 0,
   });
 
-  getStatus().then((response) => {
-    setStatus(status);
-  });
+  // Define a ref object to avoid a timer to be created
+  // on every component update
+  const timer = React.useRef<number>(0);
+
+  const checkStatus = () => {
+    getStatus().then((response) => {
+      if (status.status !== response.status) {
+        // @ts-ignore
+        setStatus(response);
+        if (response.status === 'Done') {
+          clearInterval(timer.current);
+        }
+      }
+    });
+  };
+
+  const runStatusPoll = () => {
+    if (timer.current) {
+      clearInterval(timer.current);
+    }
+    // @ts-ignore
+    timer.current = setInterval(checkStatus, 5000);
+  };
 
   const getData = () => {
     start().then((resp) => {
@@ -21,6 +41,7 @@ function useApi() {
           status,
           estimatedTime,
         });
+        runStatusPoll();
       }
     });
   };
