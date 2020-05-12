@@ -1,11 +1,17 @@
 import React from 'react';
 import './App.css';
-import { start, getStatus } from './api';
+import { start, getStatus, Status } from './api';
 import { stat } from 'fs';
 
+type ApiStatusResponse = {
+  ok: boolean;
+  status: Status;
+  estimatedTime: number;
+};
+
 function useApi() {
-  const [status, setStatus] = React.useState({
-    status: 'NOTHING',
+  const [status, setStatus] = React.useState<Partial<ApiStatusResponse>>({
+    status: null,
     estimatedTime: 0,
   });
 
@@ -14,9 +20,8 @@ function useApi() {
   const timer = React.useRef<number>(0);
 
   const checkStatus = () => {
-    getStatus().then((response) => {
+    getStatus().then((response: Partial<ApiStatusResponse>) => {
       if (status.status !== response.status) {
-        // @ts-ignore
         setStatus(response);
         if (response.status === 'Done') {
           clearInterval(timer.current);
@@ -35,7 +40,7 @@ function useApi() {
 
   const getData = () => {
     start().then((resp) => {
-      const { ok, status, estimatedTime } = resp;
+      const { ok, status, estimatedTime } = resp as ApiStatusResponse;
       if (ok) {
         setStatus({
           status,
