@@ -1,11 +1,14 @@
 import React from 'react';
 import './App.css';
-import {start} from "./api";
+import useApi from './useApi';
+import { stat } from 'fs';
 
 function App() {
+  const { status, getData } = useApi();
   return (
     <div className="App">
-      <button onClick={start}>start</button>
+      <button onClick={getData}>start</button>
+      <div>{status}</div>
     </div>
   );
 }
